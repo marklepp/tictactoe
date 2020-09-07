@@ -139,6 +139,6 @@
   if (document.readyState !== "loading") {
     initializeBoard();
   } else {
-    document.body.addEventListener("DOMContentLoaded", initializeBoard);
+    window.addEventListener("DOMContentLoaded", initializeBoard);
   }
 })();
