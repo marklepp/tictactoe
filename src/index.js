@@ -103,19 +103,39 @@
       } else {
         alert("Player 2 won!");
       }
+      return true;
+    }
+    return false;
+  }
+
+  function removeRestOfClickListeners() {
+    var cells = document.querySelectorAll(".js-tictactoe-cell");
+    for (var cell of cells) {
+      cell.removeEventListener("click", markCell);
+    }
+  }
+
+  function markCell(e) {
+    var symbol = nextMark();
+    e.target.innerHTML = symbol;
+    e.target.removeEventListener("click", markCell);
+    if (
+      checkWinCondition(
+        symbol,
+        Number(e.target.dataset.row),
+        Number(e.target.dataset.column)
+      )
+    ) {
+      removeRestOfClickListeners();
     }
   }
 
   function initCell(rownumber, columnnumber) {
     var cell = document.createElement("td");
+    cell.classList.add("js-tictactoe-cell");
     cell.dataset.row = rownumber;
     cell.dataset.column = columnnumber;
-    cell.addEventListener("click", function markCell(e) {
-      var symbol = nextMark();
-      e.target.innerHTML = symbol;
-      e.target.removeEventListener("click", markCell);
-      checkWinCondition(symbol, rownumber, columnnumber);
-    });
+    cell.addEventListener("click", markCell);
     return cell;
   }
 
