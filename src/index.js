@@ -15,30 +15,49 @@
     return 'td[data-row="' + row + '"][data-column="' + column + '"]';
   }
 
-  function checkHorizontalWin(symbol, row, column) {
-    var winning = 0;
-    for (var i = column - 4; i <= column + 4; i++) {
-      var localValue = document.querySelector(coordinateSelector(row, i));
-      if (localValue) {
-        if (symbol === localValue.innerHTML) {
-          winning++;
-        } else {
-          winning = 0;
-        }
-        if (winning === 5) {
-          return true;
-        }
-      }
+  function cellIterator(rowStart, rowEnd, columnStart, columnEnd) {
+    var currentRow = rowStart;
+    var dRow = 1;
+    var currentCol = columnStart;
+    var dCol = 1;
+
+    if (rowStart > rowEnd) {
+      dRow = -1;
+    } else if (rowStart === rowEnd) {
+      dRow = 0;
     }
-    return false;
+
+    if (columnStart > columnEnd) {
+      dCol = -1;
+    } else if (columnStart === columnEnd) {
+      dCol = 0;
+    }
+    return {
+      next: function () {
+        if (currentRow !== rowEnd || currentCol !== columnEnd) {
+          currentRow += dRow;
+          currentCol += dCol;
+          return {
+            value: document.querySelector(
+              coordinateSelector(currentRow, currentCol)
+            ),
+            done: false
+          };
+        } else {
+          return { value: undefined, done: true };
+        }
+      },
+      [Symbol.iterator]: function () {
+        return this;
+      }
+    };
   }
 
-  function checkVerticalWin(symbol, row, column) {
+  function checkWin(symbol, cellIter) {
     var winning = 0;
-    for (var i = row - 4; i <= row + 4; i++) {
-      var localValue = document.querySelector(coordinateSelector(i, column));
-      if (localValue) {
-        if (symbol === localValue.innerHTML) {
+    for (var cell of cellIter) {
+      if (cell) {
+        if (symbol === cell.innerHTML) {
           winning++;
         } else {
           winning = 0;
@@ -47,56 +66,19 @@
           return true;
         }
       }
-    }
-    return false;
-  }
-
-  function checkDiagonalWin(symbol, row, column) {
-    var winning = 0;
-    var x = row - 4;
-    var y = column - 4;
-    while (x <= row + 4) {
-      var localValue = document.querySelector(coordinateSelector(x, y));
-      if (localValue) {
-        if (symbol === localValue.innerHTML) {
-          winning++;
-        } else {
-          winning = 0;
-        }
-        if (winning === 5) {
-          return true;
-        }
-      }
-      x++;
-      y++;
-    }
-
-    winning = 0;
-    x = row + 4;
-    y = column - 4;
-    while (x >= row - 4) {
-      localValue = document.querySelector(coordinateSelector(x, y));
-      if (localValue) {
-        if (symbol === localValue.innerHTML) {
-          winning++;
-        } else {
-          winning = 0;
-        }
-        if (winning === 5) {
-          return true;
-        }
-      }
-      x--;
-      y++;
     }
     return false;
   }
 
   function checkWinCondition(symbol, row, column) {
     if (
-      checkHorizontalWin(symbol, row, column) ||
-      checkVerticalWin(symbol, row, column) ||
-      checkDiagonalWin(symbol, row, column)
+      checkWin(symbol, cellIterator(row, row, column - 5, column + 5)) ||
+      checkWin(symbol, cellIterator(row - 5, row + 5, column, column)) ||
+      checkWin(
+        symbol,
+        cellIterator(row - 5, row + 5, column - 5, column + 5)
+      ) ||
+      checkWin(symbol, cellIterator(row + 5, row - 5, column - 5, column + 5))
     ) {
       if ("x" === symbol) {
         alert("Player 1 won!");
