@@ -99,6 +99,7 @@
 
   function markCell(e) {
     var symbol = nextMark();
+    e.target.dataset.mark = symbol;
     e.target.innerHTML = symbol;
     e.target.removeEventListener("click", markCell);
     if (
