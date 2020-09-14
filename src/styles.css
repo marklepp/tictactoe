@@ -12,7 +12,6 @@ body {
   height: 60px;
   border: solid black 1px;
   text-align: center;
-  text-justify: center;
   font-family: Helvetica;
   font-size: 30px;
 }
@@ -21,5 +20,24 @@ body {
   background-color: rgb(124, 252, 0);
 }
 #board td[data-mark="o"] {
+  background-color: rgb(250, 128, 114);
+}
+
+.board-wrapper {
+  width: max-content;
+}
+
+.progress-bar {
+  margin-top: 10px;
+  border: 1px solid black;
+  height: 40px;
+}
+.progress-bar__progress {
+  height: 40px;
+}
+.progress-bar__progress[data-turn="x"] {
+  background-color: rgb(124, 252, 0);
+}
+.progress-bar__progress[data-turn="o"] {
   background-color: rgb(250, 128, 114);
 }

@@ -1,15 +1,43 @@
 (function () {
+  function theOtherMark(mark) {
+    if (mark === "o") {
+      mark = "x";
+    } else {
+      mark = "o";
+    }
+    return mark;
+  }
+
   var nextMark = (function () {
     var mark = "o";
     return function nextMark() {
-      if (mark === "o") {
-        mark = "x";
-      } else {
-        mark = "o";
-      }
+      mark = theOtherMark(mark);
       return mark;
     };
   })();
+
+  var nextFrame;
+  function setNextTurn(symbol) {
+    if (nextFrame) {
+      cancelAnimationFrame(nextFrame);
+    }
+    var progressbar = document.querySelector(".progress-bar__progress");
+    progressbar.style.width = "0%";
+    progressbar.dataset.turn = theOtherMark(symbol);
+
+    const startTime = Date.now();
+
+    function progressbarAnimation() {
+      var timeElapsed = Date.now() - startTime;
+      if (timeElapsed > 10000) {
+        setNextTurn(nextMark());
+      } else {
+        progressbar.style.width = (timeElapsed / 100).toString().concat("%");
+        nextFrame = requestAnimationFrame(progressbarAnimation);
+      }
+    }
+    nextFrame = requestAnimationFrame(progressbarAnimation);
+  }
 
   function coordinateSelector(row, column) {
     return 'td[data-row="' + row + '"][data-column="' + column + '"]';
@@ -102,6 +130,7 @@
     e.target.dataset.mark = symbol;
     e.target.innerHTML = symbol;
     e.target.removeEventListener("click", markCell);
+    setNextTurn(symbol);
     if (
       checkWinCondition(
         symbol,
@@ -109,6 +138,9 @@
         Number(e.target.dataset.column)
       )
     ) {
+      if (nextFrame) {
+        cancelAnimationFrame(nextFrame);
+      }
       removeRestOfClickListeners();
     }
   }
